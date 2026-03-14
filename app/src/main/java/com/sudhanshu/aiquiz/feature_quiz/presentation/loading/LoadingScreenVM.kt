@@ -83,10 +83,11 @@ class LoadingScreenVM @Inject constructor(
     private fun generateQuiz(prompt: String) {
         viewModelScope.launch {
             try {
+                Utils.log("Calling API first time")
                 val response = aiOperations.gAI_generateAIResponse(prompt)
-                Utils.log("Raw format == $response")
+//                Utils.log("Raw format == $response")
                 val json = Utils.extractJson(response)
-                Utils.log("Corrected format == $json")
+//                Utils.log("Corrected format == $json")
                 val quiz = Gson().fromJson(json, Quiz::class.java)
                 Utils.log("Quiz = $quiz")
                 val uniqueQuestionsSet = removeDuplicateQuestions(quiz.questions)

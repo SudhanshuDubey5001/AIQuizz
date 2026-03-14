@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sudhanshu.aiquiz.core.utils.Utils
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Question
+import com.sudhanshu.aiquiz.feature_quiz.domain.model.Quiz
 
 @Composable
 fun QuizView(
@@ -61,7 +62,7 @@ fun QuizView(
                         .clickable { if(!quiz.questionAttempted) onOptionSelect(index) },
                     index = index,
                     option = option,
-                    correctAnswer = quiz.correct_answer,
+                    correctAnswer = if(quiz.correct_answer.toString()!="") quiz.correct_answer.toString() else quiz.correct.toString(),
                     fontSize = fontSize,
                     fontColor = fontColor,
                     optionSelected = quiz.optionSelected,
@@ -107,9 +108,9 @@ fun OptionView(
 ) {
     Row(
         modifier = if (optionSelected == -1) modifier
-        else if (option == correctAnswer) modifier
+        else if (option == correctAnswer || isCorrect(index,correctAnswer)) modifier
             .border(2.dp, MaterialTheme.colorScheme.outline, ShapeDefaults.Medium)
-        else if (optionSelected == index) modifier
+        else if(optionSelected == index) modifier
             .border(2.dp, MaterialTheme.colorScheme.error, ShapeDefaults.Medium)
         else modifier
     ) {
@@ -126,4 +127,29 @@ fun OptionView(
             color = fontColor
         )
     }
+}
+
+fun isCorrect(optionSelected: Int, correctAnswer: String): Boolean{
+    val userIndexChar = when (correctAnswer) {
+        "A" -> 0
+        "B" -> 1
+        "C" -> 2
+        "D" -> 3
+        else -> -1
+    }
+    val userIndexCharInt = when (correctAnswer) {
+        "0" -> 0
+        "1" -> 1
+        "2" -> 2
+        "3" -> 3
+        else -> -1
+    }
+    val userIndexCharInt2 = when (correctAnswer) {
+        "0.0" -> 0
+        "1.0" -> 1
+        "2.0" -> 2
+        "3.0" -> 3
+        else -> -1
+    }
+    return userIndexChar == optionSelected || userIndexCharInt == optionSelected || userIndexCharInt2 == optionSelected
 }

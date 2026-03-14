@@ -2,6 +2,7 @@ package com.sudhanshu.aiquiz.feature_quiz.presentation.utils
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.sudhanshu.aiquiz.core.utils.Utils
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Question
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Quiz
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Resource
@@ -34,12 +35,10 @@ class QuizData @Inject constructor() {
         optionSelectedIndex: Int,
         visitedStatus: Boolean
     ) {
-        val correctAnswer = quizQuestions[questionIndex].correct_answer
-        val userAnswer = quizQuestions[questionIndex].options[optionSelectedIndex]
         _quizQuestions[questionIndex] = _quizQuestions[questionIndex].copy(
             optionSelected = optionSelectedIndex,
             questionAttempted = visitedStatus,
-            isCorrect = userAnswer == correctAnswer
+            isCorrect = isCorrect(questionIndex,optionSelectedIndex)
         )
     }
 
@@ -58,5 +57,33 @@ class QuizData @Inject constructor() {
     fun resetData(){
         _quizQuestions.clear()
         _resources.clear()
+    }
+
+    private fun isCorrect(questionIndex: Int, optionSelectedIndex: Int): Boolean{
+        val correct_answer = if(quizQuestions[questionIndex].correct_answer.toString()!="") quizQuestions[questionIndex].correct_answer.toString() else quizQuestions[questionIndex].correct.toString()
+        Utils.log("Correct answer = ${correct_answer} and selected questionIndex = ${optionSelectedIndex}")
+        val userIndexChar = when (correct_answer) {
+            "A" -> 0
+            "B" -> 1
+            "C" -> 2
+            "D" -> 3
+            else -> -1
+        }
+        val userIndexCharInt = when (correct_answer) {
+            "0" -> 0
+            "1" -> 1
+            "2" -> 2
+            "3" -> 3
+            else -> -1
+        }
+        val userIndexCharInt2 = when (correct_answer) {
+            "0.0" -> 0
+            "1.0" -> 1
+            "2.0" -> 2
+            "3.0" -> 3
+            else -> -1
+        }
+        val userAnswer = quizQuestions[questionIndex].options[optionSelectedIndex]
+        return userAnswer == correct_answer || userIndexChar == optionSelectedIndex || userIndexCharInt == optionSelectedIndex || userIndexCharInt2 == optionSelectedIndex
     }
 }

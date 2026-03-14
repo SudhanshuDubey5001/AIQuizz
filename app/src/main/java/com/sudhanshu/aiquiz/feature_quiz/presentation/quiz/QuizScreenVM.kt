@@ -124,11 +124,12 @@ class QuizScreenVM @Inject constructor(
             level = level,
             duplicateQuestionList = duplicateQuestionList
         )
+        Utils.log("Calling API ======> ${retryCount.value.toString()}")
         val response = aiOperations.gAI_generateAIResponse(prompt)
-        Utils.log(response)
-        Utils.log("Raw format == $response")
+//        Utils.log(response)
+//        Utils.log("Raw format == $response")
         val json = Utils.extractJson2(response)
-        Utils.log("Pretty format == $json")
+//        Utils.log("Pretty format == $json")
 //        val mapper = ObjectMapper()
 //        val jsonNode = mapper.readTree(json)
 //        Utils.log("JSON NODE = " + json.toString())
@@ -137,29 +138,29 @@ class QuizScreenVM @Inject constructor(
 
         for (oldQuestion in loadedQuestions) {
             for (question in quizList.questions) {
-                Utils.log("LoadedQuestion : ${oldQuestion.question}")
-                Utils.log("NewQuestion : ${question.question}")
+//                Utils.log("LoadedQuestion : ${oldQuestion.question}")
+//                Utils.log("NewQuestion : ${question.question}")
                 val score = Utils.similarityScore(
                     question.question,
                     oldQuestion.question
                 )
-                Utils.log("Score = ${score}")
-                Utils.log("Retry counter = ${retryCount.value}")
+//                Utils.log("Score = ${score}")
+//                Utils.log("Retry counter = ${retryCount.value}")
                 if (score >= 0.85) {  //if similarity score is more than 0.85 then its quite similar
-                    incrementRetryCount()
                     if (retryCount.value < AppConfigurationConstants.GENERATIVE_AI_API_CALL_RETRY_LIMIT) {
                         Utils.log("Questions similar, fetching new questions")
                         duplicateQuestionList.add(question.question)
                         Utils.log("Duplicate Questions = ${duplicateQuestionList.toString()}")
+                        incrementRetryCount()
                         getMoreQuizQuestions(duplicateQuestionList, loadedQuestions)
                         break
                     } else {
+                        resetRetryCount()
                         return quizList
                     }
                 }
             }
         }
-        resetRetryCount()
         return quizList
     }
 }

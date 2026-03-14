@@ -7,7 +7,8 @@ data class Quiz(
 data class Question(
     val question: String = "",
     val difficulty: String = "",
-    val correct_answer: String = "",
+    val correct_answer: Any = "",
+    val correct: Any = "",
     val options: List<String> = emptyList(),
     val explanation: String = "",
     val optionSelected: Int = -1,
