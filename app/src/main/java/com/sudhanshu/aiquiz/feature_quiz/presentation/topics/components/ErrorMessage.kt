@@ -1,0 +1,33 @@
+package com.sudhanshu.aiquiz.feature_quiz.presentation.topics.components
+
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+@Composable
+fun ErrorMessageDisplay(
+    errorMessage: String
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer
+        ),
+        shape = ShapeDefaults.ExtraSmall
+    ) {
+        Text(
+            modifier = Modifier.padding(14.dp),
+            text = errorMessage,
+            fontSize = 12.sp
+        )
+    }
+}
