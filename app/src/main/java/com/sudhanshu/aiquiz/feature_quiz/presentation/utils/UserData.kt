@@ -24,6 +24,10 @@ class UserData @Inject constructor() {
         )
     }
 
+    fun resetData(){
+        _user.value = User()
+    }
+
     fun addUserAnswer(questionIndex: Int, value: String) {
         _answersMap.value[questionIndex] = value
     }

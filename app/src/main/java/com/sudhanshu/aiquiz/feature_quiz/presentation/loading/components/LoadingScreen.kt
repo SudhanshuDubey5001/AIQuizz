@@ -42,6 +42,7 @@ import com.sudhanshu.aiquiz.feature_quiz.presentation.loading.LoadingScreenVM
 import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.graphicsLayer
+import com.sudhanshu.aiquiz.core.utils.Screens
 
 //@OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +53,10 @@ fun LoadingScreen(
 
     val error = viewModel.error.value
     val retrySafetyCount = viewModel.retryCountSafety.value
+
+    fun backToTopicScreen(){
+        onNavigate(Screens.BACK)
+    }
 
     LaunchedEffect(Unit){
         viewModel.uiEvent.collectLatest { event ->
@@ -126,7 +131,8 @@ fun LoadingScreen(
                     ErrorView(
                         retrySafetyCount = retrySafetyCount,
                         onRetryClick = {
-                            viewModel.onEvents(LoadingScreenEvents.retryGeneratingQuiz)
+                            backToTopicScreen()
+//                            viewModel.onEvents(LoadingScreenEvents.retryGeneratingQuiz)
                         }
                     )
                 }

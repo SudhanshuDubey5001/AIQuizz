@@ -25,8 +25,8 @@ fun Footer(navigateToTopicScreen: () -> Unit) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        AppButton(text = "Options", fontFamily = fontFamily, onClick = {
-            // TODO: implement Option screen
-        })
+//        AppButton(text = "Options", fontFamily = fontFamily, onClick = {
+//            // TODO: implement Option screen
+//        })
     }
 }

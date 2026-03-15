@@ -18,11 +18,14 @@ import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.QuizData
 import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.UserData
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Quiz
 import com.sudhanshu.aiquiz.feature_quiz.domain.repository.AI_Operations
+import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.AIModelData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,7 +33,8 @@ class QuizScreenVM @Inject constructor(
     private val aiOperations: AI_Operations,
     private val quizConfigInstance: QuizConfig,
     private val userDataInstance: UserData,
-    private val quizDataInstance: QuizData
+    private val quizDataInstance: QuizData,
+    private val aiModelData: AIModelData
 ) : ViewModel() {
 
     val quizData = quizDataInstance.quizQuestions
@@ -52,23 +56,32 @@ class QuizScreenVM @Inject constructor(
     //keeping track of api call retries
     private var retryCount = mutableStateOf(0)
 
+    fun resetQuiz() {
+        quizDataInstance.resetData()
+        userDataInstance.resetData()
+    }
+
     private fun generateMoreQuestions() {
         _loadingMoreQuestions.value = LoadingState.LOADING
         generateQuestionsJob = viewModelScope.launch {
             try {
-                val moreQuestions =
-                    getMoreQuizQuestions(mutableListOf(), quizDataInstance.quizQuestions)
+                val moreQuestions = getMoreQuizQuestions(
+                    mutableListOf(), quizDataInstance.quizQuestions
+                )
                 Utils.log("More questions = $moreQuestions")
-                quizDataInstance.setQuizData(moreQuestions)
                 resetRetryCount()
                 _loadingMoreQuestions.value = LoadingState.IDLE
+                withContext(Dispatchers.Main) {
+                    quizDataInstance.setQuizData(moreQuestions, quizDataInstance.quizQuestions)
+                }
             } catch (e: Exception) {
                 if (retryCount.value <= AppConfigurationConstants.GENERATIVE_AI_API_CALL_RETRY_LIMIT)
                     _loadingMoreQuestions.value = LoadingState.ERROR
                 else _loadingMoreQuestions.value = LoadingState.STOP_RETRY
 
-                _uiEvent.emit(UiEvent.showSnackBar(ErrorMessages.FAILED_MORE_QUIZ_QUESTIONS_GENERATE))
-                Utils.log(e.toString())
+                if(e.toString()!="java.util.ConcurrentModificationException")
+                    _uiEvent.emit(UiEvent.showSnackBar(ErrorMessages.FAILED_MORE_QUIZ_QUESTIONS_GENERATE))
+                Utils.log(e.toString() + " : " + e.stackTrace.toString())
             }
         }
     }
@@ -125,7 +138,8 @@ class QuizScreenVM @Inject constructor(
             duplicateQuestionList = duplicateQuestionList
         )
         Utils.log("Calling API ======> ${retryCount.value.toString()}")
-        val response = aiOperations.gAI_generateAIResponse(prompt)
+        Utils.log("Model using in QuizScreenVm === ${aiModelData.getModelId()}")
+        val response = aiOperations.gAI_generateAIResponse(prompt, aiModelData)
 //        Utils.log(response)
 //        Utils.log("Raw format == $response")
         val json = Utils.extractJson2(response)
@@ -136,31 +150,32 @@ class QuizScreenVM @Inject constructor(
         val quizList = Gson().fromJson(json.toString(), Quiz::class.java)
 //        return quizList
 
-        for (oldQuestion in loadedQuestions) {
-            for (question in quizList.questions) {
-//                Utils.log("LoadedQuestion : ${oldQuestion.question}")
-//                Utils.log("NewQuestion : ${question.question}")
-                val score = Utils.similarityScore(
-                    question.question,
-                    oldQuestion.question
-                )
-//                Utils.log("Score = ${score}")
-//                Utils.log("Retry counter = ${retryCount.value}")
-                if (score >= 0.85) {  //if similarity score is more than 0.85 then its quite similar
-                    if (retryCount.value < AppConfigurationConstants.GENERATIVE_AI_API_CALL_RETRY_LIMIT) {
-                        Utils.log("Questions similar, fetching new questions")
-                        duplicateQuestionList.add(question.question)
-                        Utils.log("Duplicate Questions = ${duplicateQuestionList.toString()}")
-                        incrementRetryCount()
-                        getMoreQuizQuestions(duplicateQuestionList, loadedQuestions)
-                        break
-                    } else {
-                        resetRetryCount()
-                        return quizList
-                    }
-                }
-            }
-        }
+//        To remove duplicate questions
+//        for (oldQuestion in loadedQuestions) {
+//            for (question in quizList.questions) {
+////                Utils.log("LoadedQuestion : ${oldQuestion.question}")
+////                Utils.log("NewQuestion : ${question.question}")
+//                val score = Utils.similarityScore(
+//                    question.question,
+//                    oldQuestion.question
+//                )
+////                Utils.log("Score = ${score}")
+////                Utils.log("Retry counter = ${retryCount.value}")
+//                if (score >= 0.85) {  //if similarity score is more than 0.85 then its quite similar
+//                    if (retryCount.value < AppConfigurationConstants.GENERATIVE_AI_API_CALL_RETRY_LIMIT) {
+//                        Utils.log("Questions similar, fetching new questions")
+//                        duplicateQuestionList.add(question.question)
+//                        Utils.log("Duplicate Questions = ${duplicateQuestionList.toString()}")
+//                        incrementRetryCount()
+//                        getMoreQuizQuestions(duplicateQuestionList, loadedQuestions)
+//                        break
+//                    } else {
+//                        resetRetryCount()
+//                        return quizList
+//                    }
+//                }
+//            }
+//        }
         return quizList
     }
 }

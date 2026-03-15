@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.sudhanshu.aiquiz.core.presentation.components.QuizAppNavigationBar
 import com.sudhanshu.aiquiz.core.utils.Screens
+import com.sudhanshu.aiquiz.core.utils.Utils
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Level
 import com.sudhanshu.aiquiz.feature_quiz.presentation.options.OptionScreenEvents
 import com.sudhanshu.aiquiz.feature_quiz.presentation.options.OptionScreenVM
@@ -71,43 +72,50 @@ fun OptionScreen(
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Spacer(modifier = Modifier.height(20.dp))
 
-                CardCustom() {
-                    CardHeading(heading = "Name")
-                    NameInput(
-                        user = user,
-                        onValueChanged = { name ->
-                            viewModel.onEvents(OptionScreenEvents.OnValueChangedNameInput(name))
-                        })
-                }
+                ModelSelectView(
+                    selectedModel = viewModel.getModel(),
+                    onModelSelected = { model ->
+                        viewModel.changeModel(model)
+                    }
+                )
+
+//                CardCustom() {
+//                    CardHeading(heading = "Name")
+//                    NameInput(
+//                        user = user,
+//                        onValueChanged = { name ->
+//                            viewModel.onEvents(OptionScreenEvents.OnValueChangedNameInput(name))
+//                        })
+//                }
 
                 SpacerCustom()
 
-                CardCustom {
-                    CardHeading(heading = "Questions")
-                    QuestionsComponentView(
-                        count = config.questionsCount,
-                        onPressQuestionCounter = {
-                            showQuestionsCounter.value = true
-                        }
-                    )
-                    SpacerCustom()
-
-                    Slider(
-                        value = config.questionsCount.toFloat(),
-                        onValueChange = { value ->
-                            viewModel.onEvents(OptionScreenEvents.OnValueChangedQuestionsCount(value))
-                        },
-                        valueRange = 5f..50f,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 10.dp),
-                        colors = SliderDefaults.colors(
-                            thumbColor = MaterialTheme.colorScheme.scrim,
-                            activeTrackColor = MaterialTheme.colorScheme.scrim
-                        )
-                    )
-                    SpacerCustom()
-                }
+//                CardCustom {
+//                    CardHeading(heading = "Questions")
+//                    QuestionsComponentView(
+//                        count = config.questionsCount,
+//                        onPressQuestionCounter = {
+//                            showQuestionsCounter.value = true
+//                        }
+//                    )
+//                    SpacerCustom()
+//
+//                    Slider(
+//                        value = config.questionsCount.toFloat(),
+//                        onValueChange = { value ->
+//                            viewModel.onEvents(OptionScreenEvents.OnValueChangedQuestionsCount(value))
+//                        },
+//                        valueRange = 5f..50f,
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(horizontal = 10.dp),
+//                        colors = SliderDefaults.colors(
+//                            thumbColor = MaterialTheme.colorScheme.scrim,
+//                            activeTrackColor = MaterialTheme.colorScheme.scrim
+//                        )
+//                    )
+//                    SpacerCustom()
+//                }
                 SpacerCustom()
 
                 CardCustom {
@@ -147,7 +155,6 @@ fun OptionScreen(
                 }
             }
         }
-
     }
 }
 

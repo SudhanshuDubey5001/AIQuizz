@@ -14,6 +14,7 @@ import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.UserData
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Question
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Resources
 import com.sudhanshu.aiquiz.feature_quiz.domain.repository.AI_Operations
+import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.AIModelData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -24,7 +25,8 @@ class ResultScreenVM @Inject constructor(
     private val aiOperations: AI_Operations,
     private val quizDataInstance: QuizData,
     private val userDataInstance: UserData,
-    private val quizConfig: QuizConfig
+    private val quizConfig: QuizConfig,
+    private val aiModelData: AIModelData
 ) : ViewModel(){
 
     private val config = quizConfig.configuration.value
@@ -41,6 +43,11 @@ class ResultScreenVM @Inject constructor(
 
     private val _loadingResource = mutableStateOf(false)
     val loadingResources = _loadingResource
+
+    fun resetQuiz() {
+        quizDataInstance.resetData()
+        userDataInstance.resetData()
+    }
 
     init {
         resultState.value = calculateScore()
@@ -119,7 +126,7 @@ class ResultScreenVM @Inject constructor(
         _loadingResource.value = true
         viewModelScope.launch {
             try {
-                val response = aiOperations.gAI_generateAIResponse(prompt)
+                val response = aiOperations.gAI_generateAIResponse(prompt,aiModelData)
 //                val response = MockResponses.resources  //mock resource
                 Utils.log("Raw format == $response")
                 val json = Utils.extractJson(response)

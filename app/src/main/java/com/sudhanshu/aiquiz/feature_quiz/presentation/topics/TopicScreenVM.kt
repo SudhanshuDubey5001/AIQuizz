@@ -13,6 +13,7 @@ import com.sudhanshu.aiquiz.core.utils.Prompts
 import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.QuizConfig
 import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.PopularTopics
 import com.sudhanshu.aiquiz.feature_quiz.domain.repository.AI_Operations
+import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.AIModelData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -25,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TopicScreenVM @Inject constructor(
     private val aiOperations: AI_Operations,
-    private val quizConfig: QuizConfig
+    private val quizConfig: QuizConfig,
+    private val aiModelData: AIModelData
 ) : ViewModel() {
 
     private val _topicProps = mutableStateOf(Topic())
@@ -165,8 +167,7 @@ class TopicScreenVM @Inject constructor(
     }
 
     private suspend fun callGeminiAPI(prompt: String): String {
-        val response = aiOperations.gAI_generateAIResponse(prompt = prompt)
-        return response
+        return aiOperations.gAI_generateAIResponse(prompt = prompt, aiModelData = aiModelData)
     }
 }
 

@@ -26,8 +26,20 @@ class QuizData @Inject constructor() {
 //    }
 // ---------------------------------------
 
-    fun setQuizData(data: Quiz) {
-        _quizQuestions.addAll(data.questions)
+    fun setQuizData(data: Quiz, loadedQuestions: SnapshotStateList<Question>) {
+
+        if(loadedQuestions.isEmpty()) {
+            _quizQuestions.addAll(data.questions)
+            return
+        }
+
+        for(oldQ in loadedQuestions){
+            for(newQ in data.questions){
+                val similarityScore = Utils.similarityScore(oldQ.question,newQ.question)
+                if(similarityScore<0.85) _quizQuestions.add(newQ)
+            }
+        }
+//        _quizQuestions.addAll(data.questions)
     }
 
     fun setOptionSelected(

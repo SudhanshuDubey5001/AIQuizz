@@ -56,9 +56,9 @@ fun ErrorView(
             ) {
                 Text(
                     modifier = Modifier.padding(10.dp),
-                    text = "Retry",
+                    text = "Choose different AI Model",
                     fontFamily = Utils.fontFamily,
-                    fontSize = 24.sp
+                    fontSize = 18.sp
                 )
             }
     }

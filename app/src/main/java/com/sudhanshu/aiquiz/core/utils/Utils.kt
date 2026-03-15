@@ -137,4 +137,33 @@ object Utils {
 
         return max(lev, jac)
     }
+
+    enum class ModelId(val id: String) {
+        ORPHEUS_ARABIC("canopylabs/orpheus-arabic-saudi"),
+        ORPHEUS_ENGLISH("canopylabs/orpheus-v1-english"),
+        LLAMA4_SCOUT("meta-llama/llama-4-scout-17b-16e-instruct"),
+        PROMPT_GUARD_22M("meta-llama/llama-prompt-guard-2-22m"),
+        PROMPT_GUARD_86M("meta-llama/llama-prompt-guard-2-86m"),
+        KIMI_K2("moonshotai/kimi-k2-instruct-0905"),
+        GPT_OSS_SAFE("openai/gpt-oss-safeguard-20b"),
+        QWEN3_32B("qwen/qwen3-32b"),
+        GROQ("groq/compound"),
+        OPENAI_GPT_OSS_120B("openai/gpt-oss-120b"),
+        ORPHEUS_ARABIC_SAUDI("canopylabs/orpheus-arabic-saudi"),
+        ORPHEUS_V1_ENGLISH("canopylabs/orpheus-v1-english"),
+        LLAMA_4_SCOUT_17B("meta-llama/llama-4-scout-17b-16e-instruct"),
+        GPT_OSS_SAFEGUARD_20B("openai/gpt-oss-safeguard-20b"),
+        GPT_OSS_120B("openai/gpt-oss-120b"),
+        GPT_OSS_20B("openai/gpt-oss-20b"),
+        LLAMA_3_1_8B("llama-3.1-8b-instant"),
+        LLAMA_3_3_70B("llama-3.3-70b-versatile"),
+        WHISPER_LARGE_V3("whisper-large-v3"),
+        WHISPER_LARGE_V3_TURBO("whisper-large-v3-turbo");
+
+        companion object {
+            fun fromName(name: String): ModelId? {
+                return entries.find { it.name == name }
+            }
+        }
+    }
 }

@@ -1,7 +1,9 @@
 package com.sudhanshu.aiquiz.feature_quiz.presentation.loading
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -15,6 +17,7 @@ import com.sudhanshu.aiquiz.feature_quiz.domain.model.Question
 import com.sudhanshu.aiquiz.feature_quiz.domain.model.Quiz
 import com.sudhanshu.aiquiz.feature_quiz.domain.repository.AI_Operations
 import com.sudhanshu.aiquiz.feature_quiz.domain.repository.ApiService
+import com.sudhanshu.aiquiz.feature_quiz.presentation.utils.AIModelData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,7 +30,8 @@ import javax.inject.Inject
 class LoadingScreenVM @Inject constructor(
     private val aiOperations: AI_Operations,
     private val quizConfig: QuizConfig,
-    private val quizData: QuizData
+    private val quizData: QuizData,
+    private val aiModelData: AIModelData
 ) : ViewModel() {
 
     private val config = quizConfig.configuration.value
@@ -84,14 +88,14 @@ class LoadingScreenVM @Inject constructor(
         viewModelScope.launch {
             try {
                 Utils.log("Calling API first time")
-                val response = aiOperations.gAI_generateAIResponse(prompt)
+                val response = aiOperations.gAI_generateAIResponse(prompt,aiModelData)
 //                Utils.log("Raw format == $response")
                 val json = Utils.extractJson(response)
 //                Utils.log("Corrected format == $json")
                 val quiz = Gson().fromJson(json, Quiz::class.java)
                 Utils.log("Quiz = $quiz")
                 val uniqueQuestionsSet = removeDuplicateQuestions(quiz.questions)
-                quizData.setQuizData(Quiz(uniqueQuestionsSet))
+                quizData.setQuizData(Quiz(uniqueQuestionsSet), mutableStateListOf())
                 _uiEvent.emit(UiEvent.navigate(Screens.QUIZ))
             } catch (e: Exception) {
                 error.value = true

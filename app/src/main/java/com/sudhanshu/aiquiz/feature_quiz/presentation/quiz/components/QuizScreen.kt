@@ -40,6 +40,7 @@ import com.sudhanshu.aiquiz.core.presentation.UiEvent
 import com.sudhanshu.aiquiz.core.presentation.components.QuizAppNavigationBar
 import com.sudhanshu.aiquiz.core.utils.Screens
 import com.sudhanshu.aiquiz.core.utils.Utils
+import com.sudhanshu.aiquiz.feature_quiz.domain.model.User
 import com.sudhanshu.aiquiz.feature_quiz.presentation.quiz.LoadingState
 import com.sudhanshu.aiquiz.feature_quiz.presentation.quiz.QuizScreenEvents
 import com.sudhanshu.aiquiz.feature_quiz.presentation.quiz.QuizScreenVM
@@ -63,10 +64,18 @@ fun QuizScreen(
     val lastpage = remember { mutableStateOf(questionsList.lastIndex) }
 
     fun onClickBackButton() {
+        viewModel.resetQuiz()
         onNavigate(Screens.BACK)
     }
 
     fun onClickSubmitButton() {
+        if(!viewModel.quizData.any { it.questionAttempted }) {
+            scope.launch { snackbarHostState.showSnackbar(
+                message = "Atleast attempt 1 question...quack quack",
+                duration = SnackbarDuration.Short
+            ) }
+            return
+        }
         scope.launch { pagerState.scrollToPage(0) }
         onNavigate(Screens.RESULT)
     }

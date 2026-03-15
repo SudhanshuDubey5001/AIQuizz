@@ -62,6 +62,7 @@ fun ResultScreen(
     }
 
     fun navigateBackToTopicScreen(){
+        viewModel.resetQuiz()
         onNavigate(Screens.BACK)
     }
 
